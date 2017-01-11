@@ -90,6 +90,10 @@ def count_filament(color):
 			# Color has been found in sheet. Increment quantity
 			try:
 				new_quantity = int(row[1]) + 1
+				if new_quantity <= 0:
+					# Quantity on the sheet must have been negative
+					print("Current quantity is negative. Resetting to 1.")
+					new_quantity = 1
 			except:
 				# Handle case where cell is blank (row[1] will not exist)
 				new_quantity = 1
@@ -97,8 +101,8 @@ def count_filament(color):
 			print("%s found in sheet on row %d" %(color, row_number))
 	if row_number < 0:
 		# Color not yet in sheet. Add to sheet with quantity zero
-		print("%s is not yet on the sheet. Adding with quantity 0" % color)
-		new_quantity = 0
+		print("%s is not yet on the sheet. Adding with quantity 1" % color)
+		new_quantity = 1
 		row_number = current_row + 1
 	update_values = [[color, new_quantity]]
 	update_range = "A" + str(row_number) + ":B" + str(row_number)
