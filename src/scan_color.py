@@ -1,3 +1,14 @@
+__author__ = "Adam Anderson"
+__mainainer__ = "Adam Anderson"
+__email__ = "adam.b.anderson.96@gmail.com"
+
+""" Scan barcode from Makerbot filament spool to determine
+the color. For now, the color is just printed to the terminal.
+In the future, this will be integrated with the
+filament tracking Google Sheet to automate filament tracking
+in the MIC
+"""
+
 # The barcode-color mappings are stored in color_key.json
 import json
 
