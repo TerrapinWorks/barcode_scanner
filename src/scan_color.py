@@ -1,7 +1,3 @@
-__author__ = "Adam Anderson"
-__mainainer__ = "Adam Anderson"
-__email__ = "adam.b.anderson.96@gmail.com"
-
 """ Scan barcode from Makerbot filament spool to determine
 the color. For now, the color is just printed to the terminal.
 In the future, this will be integrated with the
@@ -17,6 +13,8 @@ import sys
 sys.path.append('google_api_functions')
 import google_api_functions as api
 
+# For using the Google API
+APP_DETAILS_FILE = "../bin/app_details.json"
 # A scanned barcode returns 8 bytes
 BYTES_PER_SCAN = 8
 
@@ -72,7 +70,8 @@ def scan():
 def count_filament(color):
 	""" Log scanned color to the Filament Tracking spreadsheet
 	"""
-	sheets_service = api.get_sheets_service()
+	api_object = api.get_api_object(APP_DETAILS_FILE)
+	sheets_service = api_object.get_sheets_service()
 	# Get sheet ID from the file
 	with open('../bin/sheet_id.txt', 'r') as sheet_id_file:
 		spreadsheet_id = sheet_id_file.readline().splitlines()[0]
