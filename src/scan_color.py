@@ -106,6 +106,8 @@ def count_filament(color):
 			except:
 				# Handle case where cell is blank (row[1] will not exist)
 				new_quantity = 0
+				api_object.log_message(sheet_id, "Invalid quantity on row %d. "
+							"Resetting to 0." % current_row)
 			row_number = current_row
 			print("%s found in sheet on row %d" %(color, row_number))
 	if row_number < 0:
