@@ -13,17 +13,22 @@ import sys
 sys.path.append('google_api_functions')
 import google_api_functions as api
 
-# For logging to the spreadsheet
-from log_message import log_message
-
 # For using the Google API
 APP_DETAILS_FILE = "../bin/app_details.json"
+api_object = api.get_api_object(APP_DETAILS_FILE)
+# For logging errors
+LOGFILE = "../bin/log.txt"
 # A scanned barcode returns 8 bytes
 BYTES_PER_SCAN = 8
 
 # Get the barcode-color mappings
 with open('../bin/color_key.json', 'r') as mapping_file:
 	mappings = json.loads(mapping_file.read())
+
+# Get the ID for the filament tracking sheet
+with open('../bin/sheet_id.txt', 'r') as sheet_id_file:
+	# Sheet ID on first line of file
+	sheet_id = sheet_id_file.read().splitlines()[0]
 
 # We can read bytes from the scanner using its device file, hidraw0
 scanner = open('/dev/hidraw0', 'rb')
@@ -33,7 +38,7 @@ def scan():
 	Keyboard Interrupt. 
 	"""
 	print("Reading input from the scanner. Press Ctrl+c to quit.\n")
-	log_message("START SCANNING")
+	api_object.log_message(sheet_id, "START SCANNING", LOGFILE)
 	current_code = ""
 	while True:
 		try:
@@ -62,7 +67,7 @@ def scan():
 							count_filament(color)
 						except KeyError:
 							print("Barcode does not correspond to any known color")
-							log_message("Invalid barcode scanned")
+							api_object.log_message(sheet_id, "Invalid barcode scanned", logfile)
 						finally:
 							# Reset the code string so more codes can be scanned
 							current_code = ""
@@ -70,13 +75,12 @@ def scan():
 						current_code += str(usage_id) + " "
 		except KeyboardInterrupt:
 			print("\nKeyboard Interrupt: Stop scanning")
-			log_message("STOP SCANNING - Keyboard Interrupt")
+			api_object.log_message(sheet_id, "STOP SCANNING - Keyboard Interrupt", LOGFILE)
 			sys.exit()
 	
 def count_filament(color):
 	""" Log scanned color to the Filament Tracking spreadsheet
 	"""
-	api_object = api.get_api_object(APP_DETAILS_FILE)
 	sheets_service = api_object.get_sheets_service()
 	# Get sheet ID from the file
 	with open('../bin/sheet_id.txt', 'r') as sheet_id_file:
@@ -117,7 +121,8 @@ def count_filament(color):
 	update_result = sheets_service.spreadsheets().values().update(
 					spreadsheetId = spreadsheet_id, range=update_range,
 					valueInputOption=value_input_option, body=body).execute()
-	log_message("Change quantity: %s set to %d" % (color.upper(), new_quantity))
+	api_object.log_message(sheet_id, "Change quantity: %s set to %d" % (
+				color.upper(), new_quantity), LOGFILE)
 	
 
 # Scan barcodes if this file is executed
