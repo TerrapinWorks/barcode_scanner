@@ -67,7 +67,7 @@ def scan():
 							count_filament(color)
 						except KeyError:
 							print("Barcode does not correspond to any known color")
-							api_object.log_message(sheet_id, "Invalid barcode scanned", logfile)
+							api_object.log_message(sheet_id, "Invalid barcode scanned", LOGFILE)
 						finally:
 							# Reset the code string so more codes can be scanned
 							current_code = ""
